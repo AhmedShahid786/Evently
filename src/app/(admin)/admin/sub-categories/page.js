@@ -36,40 +36,42 @@ const subCategories = [
 
 export default function SubCategories() {
   return (
-        <div className="min-h-screen mx-10 px-1">
+    <div className="min-h-screen mx-10 px-1">
       <div className="flex justify-between items-center my-4">
         <h1 className="font-bold text-xl">Categories</h1>
         <AddSubCategory />
       </div>
-    <Table>
-      <TableCaption>A list of recent Sub Categories.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Thumbnail</TableHead>
-          <TableHead>Title</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead className="text-right">Location</TableHead>
-          <TableHead className="text-right">Date</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {subCategories.map((subCategory) => (
+      <Table>
+        <TableCaption>A list of recent Sub Categories.</TableCaption>
+        <TableHeader>
           <TableRow>
-            <TableCell>
-              <Image
-                src={subCategory.thumbnail}
-                style={{ objectFit: "cover" }}
-                height={40}
-                width={40}
-              />
-            </TableCell>
-            <TableCell className="font-medium">{subCategory.category}</TableCell>
-            <TableCell>{subCategory.title}</TableCell>
-            <TableCell>{subCategory.description}</TableCell>
+            <TableHead className="w-[100px]">Thumbnail</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead className="text-right">Location</TableHead>
+            <TableHead className="text-right">Date</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {subCategories.map((subCategory) => (
+            <TableRow key={subCategory.title}>
+              <TableCell>
+                <Image
+                  src={subCategory.thumbnail}
+                  style={{ objectFit: "cover" }}
+                  height={40}
+                  width={40}
+                />
+              </TableCell>
+              <TableCell className="font-medium">
+                {subCategory.category}
+              </TableCell>
+              <TableCell>{subCategory.title}</TableCell>
+              <TableCell>{subCategory.description}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

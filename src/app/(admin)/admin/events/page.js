@@ -43,7 +43,7 @@ export default function Events() {
       </TableHeader>
       <TableBody>
         {events.map((event) => (
-          <TableRow>
+          <TableRow key={event.title}>
             <TableCell>
               <Image
                 src={event.thumbnail}
