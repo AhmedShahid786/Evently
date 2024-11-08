@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/db/connectDB";
 import { subCategoryModel } from "@/lib/models/subCategory";
+import { categoryModel } from "@/lib/models/category";
 
 export async function GET(request) {
   await connectDB();
@@ -9,7 +10,7 @@ export async function GET(request) {
   if(searchParams.get("category")){
     query.category = searchParams.get("category");
   }
-  const subCategories = await subCategoryModel.find(query);
+  const subCategories = await subCategoryModel.find(query).populate("category", "title");
 
   return Response.json(
     {
