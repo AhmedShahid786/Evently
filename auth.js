@@ -5,9 +5,9 @@ import Google from "next-auth/providers/google";
 
 const handleUser = async (profile) => {
   await connectDB();
-  const user = await UserModal.findOne({ email: profile.email });
+  const user = await userModel.findOne({ email: profile.email });
   if (user) return user;
-  let newUser = new UserModal({
+  let newUser = new userModel({
     fullname: profile.name,
     email: profile.email,
     profileImg: profile.picture,

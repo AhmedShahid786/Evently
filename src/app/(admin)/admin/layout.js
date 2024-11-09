@@ -1,11 +1,15 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { auth } from "../../../../auth";
+import { redirect } from "next/navigation";
 
-export default function Layout({ children }) {
+export default async function Layout({ children }) {
+  const session = await auth()
+  if(!session) redirect("/login")
   return (
     <html>
-      <body className="min-w-screen min-h-screen">
+      <body className="min-w-screen min-h-screen">  
         <SidebarProvider>
           <AppSidebar />
           <main className="w-full h-full">

@@ -1,4 +1,4 @@
-import { Image } from "lucide-react";
+import Image from "next/image";
 import { auth, signIn, signOut } from "../../../auth";
 
 export default async function SignIn() {
@@ -6,10 +6,10 @@ export default async function SignIn() {
     console.log("Session =>", session);
     
   return (
-    <div className="mx-auto">
+    <div className="h-screen w-screen flex justify-center items-center">
       {session ? (
         <div className="flex flex-col gap-12 items-center justify-between">
-          <img
+          <Image
             src={session?.user?.image}
             width={10}
             height={10}
