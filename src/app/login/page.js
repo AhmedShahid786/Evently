@@ -3,7 +3,6 @@ import { auth, signIn, signOut } from "../../../auth";
 
 export default async function SignIn() {
     const session = await auth()
-    console.log("Session =>", session);
     
   return (
     <div className="h-screen w-screen flex justify-center items-center">
