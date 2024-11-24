@@ -1,4 +1,7 @@
-import { AddSubCategory } from "@/components/add-sub-category";
+import { getCategories } from "@/actions/categories";
+import { getSubCategories } from "@/actions/sub-categories";
+import { AddSubCategory } from "@/components/Add-Sub-Category/Add-Sub-Category";
+import CategoryDropdown from "@/components/Category-Dropdown/Category-Dropdown";
 import {
   Table,
   TableBody,
@@ -10,36 +13,18 @@ import {
 } from "@/components/ui/table";
 import Image from "next/image";
 
-const subCategories = [
-  {
-    title: "Cricket",
-    category: "Sports",
-    thumbnail:
-      "https://images.unsplash.com/photo-1470920456752-d50214d7ed59?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y3ljbGluZ3xlbnwwfHwwfHx8MA%3D%3D",
-    description: "All Community Members will be have cycling Race",
-  },
-  {
-    title: "Footbal",
-    category: "Sports",
-    thumbnail:
-      "https://images.unsplash.com/photo-1470920456752-d50214d7ed59?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y3ljbGluZ3xlbnwwfHwwfHx8MA%3D%3D",
-    description: "All Community Members will be have cycling Race",
-  },
-  {
-    title: "Tennis",
-    category: "Sports",
-    thumbnail:
-      "https://images.unsplash.com/photo-1470920456752-d50214d7ed59?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y3ljbGluZ3xlbnwwfHwwfHx8MA%3D%3D",
-    description: "All Community Members will be have cycling Race",
-  },
-];
+export default async function SubCategories({searchParams}) {
 
-export default function SubCategories() {
+  let subCategories = await getSubCategories(searchParams.category);
+  subCategories = subCategories.subCategories
+
+  const categories = (await getCategories()).categories
   return (
     <div className="min-h-screen mx-10 px-1">
       <div className="flex justify-between items-center my-4">
-        <h1 className="font-bold text-xl">Categories</h1>
-        <AddSubCategory />
+        <h1 className="font-bold text-xl">Sub Categories</h1>
+        <CategoryDropdown categories={categories} />
+        <AddSubCategory categories={categories} />
       </div>
       <Table>
         <TableCaption>A list of recent Sub Categories.</TableCaption>
@@ -57,14 +42,19 @@ export default function SubCategories() {
             <TableRow key={subCategory.title}>
               <TableCell>
                 <Image
-                  src={subCategory.thumbnail}
+                  src={
+                    subCategory.thumbnail === "null"
+                      ? "https://images.unsplash.com/photo-1633591324611-55ee4caa790f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Z3JlbmFkZXxlbnwwfHwwfHx8MA%3D%3D"
+                      : subCategory.thumbnail
+                  }
                   style={{ objectFit: "cover" }}
                   height={40}
                   width={40}
+                  alt="subcategory thumbnail"
                 />
               </TableCell>
               <TableCell className="font-medium">
-                {subCategory.category}
+                {subCategory.category.title}
               </TableCell>
               <TableCell>{subCategory.title}</TableCell>
               <TableCell>{subCategory.description}</TableCell>

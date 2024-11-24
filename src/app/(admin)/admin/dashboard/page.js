@@ -1,6 +1,6 @@
 "use client"
 
-import Chart from "@/components/barchart";
+import Chart from "@/components/Barchart/Barchart";
 
 export default function Dashboard() {
   return (
