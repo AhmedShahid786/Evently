@@ -34,7 +34,7 @@ export function AddCategory() {
 
     await addCategory(categoryObj);
 
-    setOpen(!open);
+    setOpen(false);
     formRef?.current?.reset();
     toast({
       title: "Category Added",

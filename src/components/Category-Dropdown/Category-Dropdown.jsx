@@ -27,10 +27,10 @@ export default function CategoryDropdown({ categories }) {
   }
   return (
     <Select onValueChange={handleSelectCategory}>
-      <SelectTrigger className="w-[180px] border-2 border-secondary text-white font-poppins">
+      <SelectTrigger className="w-[180px] border-2 border-primary text-white font-poppins">
         <SelectValue placeholder="Select Category" />
       </SelectTrigger>
-      <SelectContent className="border-2 border-secondary text-white font-poppins bg-transparent">
+      <SelectContent className="border-2 border-primary text-white font-poppins bg-transparent">
         <SelectGroup>
           <SelectLabel>Categories</SelectLabel>
           <SelectItem value={"All"}>All</SelectItem>
