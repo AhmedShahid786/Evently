@@ -27,7 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true
     },
     async jwt({ token, user, profile, account }) {
-      console.log("profile=>", profile);
+      // console.log("profile=>", profile);
       if (user) {
         // User is available during sign-in
         token._id = profile._id;
@@ -36,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     session({ session, token }) {
-      console.log("session data=>", token);
+      // console.log("session data=>", token);
       session.user.id = token.id;
       session.user._id = token._id;
       session.user.role = token.role;

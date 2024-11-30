@@ -24,6 +24,7 @@
     "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",
+    "dayjs": "^1.11.13",
     "framer-motion": "^11.11.17",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.453.0",
