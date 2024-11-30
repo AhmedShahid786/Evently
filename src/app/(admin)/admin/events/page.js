@@ -1,3 +1,6 @@
+import { getCategories } from "@/actions/categories";
+import { getEvents } from "@/actions/events";
+import AddEventForm from "@/components/Add-Event-Form/AddEventForm";
 import {
   Table,
   TableBody,
@@ -8,57 +11,49 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import { auth } from "../../../../../auth";
+import CategoryDropdown from "@/components/Category-Dropdown/Category-Dropdown";
 
-const events = [
-  {
-    title: "Birthday Event",
-    description: "Birthday of Baby Girl",
-    location: "Karachi",
-    thumbnail:
-      "https://images.unsplash.com/flagged/photo-1553056011-7811272649cb?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YmlydGhkYXklMjBiYWJ5JTIwZ2lybHxlbnwwfHwwfHx8MA%3D%3D",
-    date: new Date().toLocaleDateString(),
-  },
-  {
-    title: "Cycling Marathon",
-    description: "All Community Members will be have cycling Race",
-    location: "Karachi",
-    thumbnail:
-      "https://images.unsplash.com/photo-1470920456752-d50214d7ed59?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y3ljbGluZ3xlbnwwfHwwfHx8MA%3D%3D",
-    date: new Date().toLocaleDateString(),
-  },
-];
+export default async function Events({ searchParams }) {
+  const events = (await getEvents(searchParams.category)).events;
+  const categories = (await getCategories()).categories;
+  const session = await auth();
 
-export default function Events() {
   return (
-    <Table>
-      <TableCaption>A list of recent events.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Thumbnail</TableHead>
-          <TableHead>Title</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead className="text-right">Location</TableHead>
-          <TableHead className="text-right">Date</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {events.map((event) => (
-          <TableRow key={event.title}>
-            <TableCell>
-              <Image
-                src={event.thumbnail}
-                style={{ objectFit: "cover" }}
-                height={40}
-                width={40}
-              />
-            </TableCell>
-            <TableCell className="font-medium">{event.title}</TableCell>
-            <TableCell>{event.description}</TableCell>
-            <TableCell>{event.location}</TableCell>
-            <TableCell>{event.date}</TableCell>
+    <div className="min-h-screen mx-10 px-1">
+      <div className="flex justify-between items-center my-4">
+        <h1 className="font-bold text-xl">Events</h1>
+        <CategoryDropdown categories={categories} />
+        <AddEventForm session={session} categories={categories} />
+      </div>
+      <Table>
+        <TableCaption>A list of recent events.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Thumbnail</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead className="text-right">Location</TableHead>
+            <TableHead className="text-right">Date</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {events.map((event) => (
+            <TableRow key={event._id}>
+              <TableCell>
+                <Image
+                  src={event.thumbnail}
+                  style={{ objectFit: "cover" }}
+                  height={40}
+                  width={40}
+                />
+              </TableCell>
+              <TableCell className="font-medium">{event.title}</TableCell>
+              <TableCell>{event.description}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
