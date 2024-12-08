@@ -12,11 +12,14 @@ const userSchema = new Schema({
   profileImg: String,
   address: String,
   bio: String,
-  role : {
-          type : String,
-          default : "user",
-          enum : ["user", "admin"]
-  }
+  role: {
+    type: String,
+    default: "user",
+    enum: ["user", "admin"],
+  },
+  otp: String,
+  otpExpiry: { type: Date, required: true },
+  isVerified: { type: Boolean, default: false },
 });
 
 export const userModel =
