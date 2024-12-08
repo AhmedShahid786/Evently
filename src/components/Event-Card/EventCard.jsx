@@ -6,7 +6,7 @@ import { MapPin } from "lucide-react";
 export default function EventCard({ event }) {
   const { _id, category, title, description, thumbnail, address } = event;
   return (
-    <div className="w-60 flex flex-col items-start justify-between gap-2 p-2 border-2 border-primary rounded-lg">
+    <div className="w-60 flex flex-col items-start justify-between gap-1 p-2 border-2 border-primary rounded-lg">
       <div>
         <h1 className="text-primary text-xl font-lilita tracking-wide">
           {title}
@@ -24,10 +24,12 @@ export default function EventCard({ event }) {
         />
       </div>
       <p className="text-primary text-xs font-sans inline-flex items-center justify-center gap-1">
-        <MapPin size={12} />
-        {address}
+        <span>
+          <MapPin size={16} />
+        </span>
+        <span className="line-clamp-1">{address}</span>
       </p>
-      <h3 className="text-white font-poppins text-sm text-left line-clamp-3">
+      <h3 className="text-white font-poppins text-sm text-left line-clamp-2">
         {description}
       </h3>
       <Link href={`/events/${_id}`} className="w-full">

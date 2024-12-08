@@ -1,20 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useRef, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -23,226 +9,260 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { addEvent } from "@/actions/events";
+import { addEventToDb } from "@/actions/events";
 import { useToast } from "../ui/hooks/use-toast";
-
-const schema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  startTime: z.string().min(1, "Start time is required"),
-  endTime: z.string().min(1, "End time is required"),
-  thumbnail: z.string().url("Invalid URL for thumbnail"),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-  category: z.string(),
-  lat: z.string(),
-  long: z.string(),
-  address: z.string().min(1, "Address is required"),
-});
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AddEventForm({ session, categories }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const formRef = useRef();
 
-  const [isOpen, setIsOpen] = useState(false);
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      title: "",
-      description: "",
-      startTime: "",
-      endTime: "",
-      thumbnail: "",
-      startDate: "",
-      endDate: "",
-      lat: 0,
-      long: 0,
-      address: "",
-      category: "",
-    },
-  });
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    const formData = new FormData(formRef?.current);
+    formData.append("createdBy", session?.user?._id);
 
-  const onSubmit = async (defaultValues) => {
-    const obj = { ...defaultValues };
-    obj.location = {
-      lat: +obj.lat,
-      long: +obj.long,
-    };
-    obj.createdBy = session.user._id;
-    await addEvent(obj);
-    reset();
-    setIsOpen(false);
-    toast({
-      title: "Event added successfully",
-    });
+    try {
+      await addEventToDb(formData);
+      setOpen(false);
+      toast({ title: "Event Added", description: "Event Added Successfully" });
+      formRef?.current?.reset();
+    } catch (err) {
+      console.log(err);
+      toast({ title: "Oops", description: "Something went wrong" });
+    }
+    setLoading(false);
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="outline">Add Event</Button>
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+      <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto bg-black">
         <SheetHeader>
-          <SheetTitle>Add New Event</SheetTitle>
-          <SheetDescription>
+          <SheetTitle className="font-lilita text-3xl text-primary tracking-wider">
+            Add New Event
+          </SheetTitle>
+          <SheetDescription className="font-poppins text-white">
             Fill in the details for your new event.
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="title">Title</Label>
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => <Input {...field} />}
-            />
-            {errors.title && (
-              <p className="text-red-500 text-sm">{errors.title.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => <Textarea {...field} />}
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="startDate">Start Date</Label>
-              <Controller
-                name="startDate"
-                control={control}
-                render={({ field }) => <Input type="date" {...field} />}
-              />
-              {errors.startDate && (
-                <p className="text-red-500 text-sm">
-                  {errors.startDate.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="endDate">End Date</Label>
-              <Controller
-                name="endDate"
-                control={control}
-                render={({ field }) => <Input type="date" {...field} />}
-              />
-              {errors.endDate && (
-                <p className="text-red-500 text-sm">{errors.endDate.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="startTime">Start Time</Label>
-              <Controller
-                name="startTime"
-                control={control}
-                render={({ field }) => <Input type="time" {...field} />}
-              />
-              {errors.startTime && (
-                <p className="text-red-500 text-sm">
-                  {errors.startTime.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="endTime">End Time</Label>
-              <Controller
-                name="endTime"
-                control={control}
-                render={({ field }) => <Input type="time" {...field} />}
-              />
-              {errors.endTime && (
-                <p className="text-red-500 text-sm">{errors.endTime.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <Controller
-              name="category"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category._id} value={category._id}>
-                        {category.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="thumbnail">Thumbnail URL</Label>
-            <Controller
-              name="thumbnail"
-              control={control}
-              render={({ field }) => <Input {...field} />}
-            />
-            {errors.thumbnail && (
-              <p className="text-red-500 text-sm">{errors.thumbnail.message}</p>
-            )}
-          </div>
-          <div className="flex">
-            <div>
-              <Label htmlFor="lat">Lat</Label>
-              <Controller
-                name="lat"
-                control={control}
-                render={({ field }) => <Input type="number" {...field} />}
-              />
-            </div>
-            <div>
-              <Label htmlFor="long">Long</Label>
-              <Controller
-                name="long"
-                control={control}
-                render={({ field }) => <Input type="number" {...field} />}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="address">Address</Label>
-            <Controller
-              name="address"
-              control={control}
-              render={({ field }) => <Input type="text" {...field} />}
-            />
-          </div>
-
-          <Button type="submit">
-            {isSubmitting ? "Loading.." : "Add Event"}
-          </Button>
-        </form>
+        <EventForm categories={categories} addEventToDb={addEventToDb} />
       </SheetContent>
     </Sheet>
   );
+
+  function EventForm() {
+    return (
+      <form
+        ref={formRef}
+        onSubmit={handleFormSubmit}
+        className="grid items-start gap-4 mt-4"
+      >
+        <div className="grid gap-2">
+          <Label
+            htmlFor="title"
+            className="text-primary font-poppins text-base"
+          >
+            Title
+          </Label>
+          <Input
+            required
+            name="title"
+            type="text"
+            id="title"
+            maxlength="150"
+            placeholder="Event Title"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label
+            htmlFor="description"
+            className="text-primary font-poppins text-base"
+          >
+            Description
+          </Label>
+          <Textarea
+            required
+            name="description"
+            id="description"
+            maxlength="1000"
+            placeholder="Event Description"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label
+              htmlFor="startDate"
+              className="text-primary font-poppins text-base"
+            >
+              Start Date
+            </Label>
+            <Input
+              required
+              name="startDate"
+              type="date"
+              id="startDate"
+              className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label
+              htmlFor="endDate"
+              className="text-primary font-poppins text-base"
+            >
+              End Date
+            </Label>
+            <Input
+              required
+              name="endDate"
+              type="date"
+              id="endDate"
+              className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label
+              htmlFor="startTime"
+              className="text-primary font-poppins text-base"
+            >
+              Start Time
+            </Label>
+            <Input
+              required
+              name="startTime"
+              type="time"
+              id="startTime"
+              className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label
+              htmlFor="endTime"
+              className="text-primary font-poppins text-base"
+            >
+              End Time
+            </Label>
+            <Input
+              required
+              name="endTime"
+              type="time"
+              id="endTime"
+              className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+            />
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label
+            htmlFor="category"
+            className="text-primary font-poppins text-base"
+          >
+            Category
+          </Label>
+          <Select name="category">
+            <SelectTrigger className="w-[180px] border-2 border-primary text-white font-poppins">
+              <SelectValue placeholder="Select Category" name="category" />
+            </SelectTrigger>
+            <SelectContent className="border-2 border-primary text-white font-poppins bg-black">
+              <SelectGroup>
+                {categories?.map((data) => (
+                  <SelectItem key={data._id} value={data._id}>
+                    {data.title}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label
+            htmlFor="thumbnail"
+            className="text-primary font-poppins text-base"
+          >
+            Thumbnail
+          </Label>
+          <Input
+            required
+            name="thumbnail"
+            type="file"
+            accept="image/*"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label
+              htmlFor="lat"
+              className="text-primary font-poppins text-base"
+            >
+              Latitude
+            </Label>
+            <Input
+              required
+              name="lat"
+              type="number"
+              id="lat"
+              step="any"
+              className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label
+              htmlFor="long"
+              className="text-primary font-poppins text-base"
+            >
+              Longitude
+            </Label>
+            <Input
+              required
+              name="long"
+              type="number"
+              id="long"
+              step="any"
+              className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+            />
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label
+            htmlFor="address"
+            className="text-primary font-poppins text-base"
+          >
+            Address
+          </Label>
+          <Input
+            required
+            name="address"
+            type="text"
+            id="address"
+            maxlength="500"
+            placeholder="Venue Address"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+          />
+        </div>
+        <Button type="submit" variant="secondary" disabled={loading}>
+          {loading ? "Adding..." : "Add Event"}
+        </Button>
+      </form>
+    );
+  }
 }
