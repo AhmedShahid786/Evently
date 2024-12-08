@@ -20,10 +20,12 @@ import { useToast } from "@/components/ui/hooks/use-toast";
 
 export function AddCategory() {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const formRef = useRef();
 
   const addCategoryToDb = async (formData) => {
+    setLoading(true);
     const thumbnailLink = await uploadImage(formData);
 
     const categoryObj = {
@@ -34,6 +36,7 @@ export function AddCategory() {
 
     await addCategory(categoryObj);
 
+    setLoading(false);
     setOpen(false);
     formRef?.current?.reset();
     toast({

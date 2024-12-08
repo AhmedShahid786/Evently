@@ -3,11 +3,10 @@ import { logo } from "@/assets";
 import Image from "next/image";
 import { auth } from "../../../auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import Link from "next/link";
 
 export default async function Navbar() {
   const session = await auth();
-  const AvatarFallbackText = session?.user.name.split(" ");
-  console.log(AvatarFallbackText);
 
   return (
     <nav className="flex items-center justify-between px-6">
@@ -25,12 +24,14 @@ export default async function Navbar() {
               src={session?.user?.image}
               className="border-2 border-primary rounded-full"
             />
-            <AvatarFallback></AvatarFallback>
+            <AvatarFallback />
           </Avatar>
         </div>
       ) : (
         <div className="flex gap-2 py-3">
-          <Button variant="outline">Login</Button>
+          <Link href={"/login"}>
+            <Button variant="outline">Login</Button>
+          </Link>
           <Button variant="secondary"> Sign Up</Button>
         </div>
       )}
