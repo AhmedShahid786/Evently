@@ -3,6 +3,29 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/dist/server/api-utils";
+import { uploadImage } from "./upload";
+
+//? This function receives event obj from front-end and makes a POST request to add a new event to db
+export const addEventToDb = async (formData) => {
+  const thumbnailUrl = await uploadImage(formData);
+
+  const eventObj = {
+    title: formData.get("title"),
+    description: formData.get("description"),
+    thumbnail: thumbnailUrl,
+    startTime: formData.get("startTime"),
+    endTime: formData.get("endTime"),
+    startDate: formData.get("startDate"),
+    endDate: formData.get("endDate"),
+    lat: Number(formData.get("lat")),
+    long: Number(formData.get("long")),
+    address: formData.get("address"),
+    category: formData.get("category"),
+    createdBy: formData.get("createdBy"),
+  };
+
+  await addEvent(eventObj);
+};
 
 //? This function receives event obj from front-end and makes a POST request to add a new event to db
 export const addEvent = async (eventObj) => {
