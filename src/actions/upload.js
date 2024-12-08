@@ -1,11 +1,10 @@
 //? This is a server action
-"use server"
+"use server";
 
 //? This fuction generates a sha-key for cloudinary upload verification
-function generateSignature(timestamp, apiSecret){
-  const crypto = require("crypto")
-  const signature = crypto.createHash("sha256").update(`timestamp=${timestamp}${apiSecret}`).digest("hex")
-  return signature
+function generateSignature(timestamp, apiSecret) {
+  const crypto = require("crypto").createHash("sha256").update(`timestamp=${timestamp}${apiSecret}`).digest("hex");
+  return signature;
 }
 
 //? This is the main function which uploads the image on cloudinary and returns the url of the uploaded image
