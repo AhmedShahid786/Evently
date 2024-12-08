@@ -1,32 +1,27 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/Sidebar/Sidebar";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Sidebar } from "@/components/SidebarMenu/SidebarMenu";
 import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
+import Head from "next/head";
 
 export default async function Layout({ children }) {
-  const session = await auth()
-  if(!session) redirect("/login")
-  if(session.user.role == "user") redirect("/")
+  const session = await auth();
+  if (!session) redirect("/login");
+  if (session.user.role === "user") redirect("/");
   return (
-    <html>
-      <body className="min-w-screen min-h-screen">
-        <SidebarProvider>
-          <AppSidebar />
-          <main className="w-full h-full">
-            <div className="w-full flex justify-between items-center my-4">
-              <SidebarTrigger />
-              <h1 className="font-bold font-sans text-3xl text-slate-500">
-                Admin Panel
-              </h1>
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-              </Avatar>
-            </div>
-            <div>{children}</div>
-          </main>
-        </SidebarProvider>
-      </body>
-    </html>
+    <>
+      <Head>
+        <title>Admin Dashboard</title>
+        <meta
+          name="description"
+          content="Manage your events, categories, subcategories and users."
+        />
+      </Head>
+      <main className="min-w-screen min-h-screen bg-black flex">
+        <aside className="w-16 min-h-screen" aria-label="Sidebar navigation">
+          <Sidebar />
+        </aside>
+        <section className="w-full h-full">{children}</section>
+      </main>
+    </>
   );
 }
