@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getEvents, getSingleEvent, goingToEvent } from "@/actions/events";
-import { getCategories } from "@/actions/categories";
+import { getSingleEvent, registerForEvent } from "@/actions/events";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -111,7 +110,7 @@ export default async function EventDetailsPage({ params }) {
             <form
               action={async () => {
                 "use server";
-                await goingToEvent(params.id, session.user._id);
+                await registerForEvent(params.id, session.user._id);
               }}
             >
               {isGoingToEvent ? (

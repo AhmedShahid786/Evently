@@ -1,10 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  getSingleEvent,
-  goingToEvent,
-  registerForEvent,
-} from "@/actions/events";
+import { getSingleEvent, registerForEvent } from "@/actions/events";
 import { auth } from "../../../../auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +16,13 @@ import {
   CalendarIcon,
   ClockIcon,
   MapPinIcon,
-  SendHorizonal,
   Tickets,
   UserCheckIcon,
-  UserIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { addComment, getComments } from "@/actions/comments";
+import { getComments } from "@/actions/comments";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Comments from "@/components/Comments/Comments";
@@ -59,43 +52,43 @@ export default async function EventDetailsPage({ params }) {
         <CardHeader>
           <div className="relative w-full h-64 mb-4">
             <Image
-              src={event.thumbnail}
-              alt={event.title}
+              src={event?.thumbnail}
+              alt={event?.title}
               fill
               className="object-cover rounded-t-lg"
             />
           </div>
           <Badge className="mb-2 px-3 py-1 max-w-fit text-black font-poppins text-xs">
-            {event.category.title}
+            {event?.category?.title}
           </Badge>
           <CardTitle className="text-3xl font-lilita text-primary tracking-wider">
-            {event.title}
+            {event?.title}
           </CardTitle>
           <CardDescription className="text-white font-poppins">
-            {event.description}
+            {event?.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-4 mb-4 text-white font-poppins text-sm">
             <CalendarIcon className="text-primary" />
             <span>
-              {formatDate(event.startDate)} - {formatDate(event.endDate)}
+              {formatDate(event?.startDate)} - {formatDate(event?.endDate)}
             </span>
           </div>
           <div className="flex items-center space-x-4 mb-4 text-white font-poppins text-sm">
             <ClockIcon className="text-primary" />
             <span>
-              {event.startTime} - {event.endTime}
+              {event?.startTime} - {event?.endTime}
             </span>
           </div>
           <div className="flex items-center space-x-4 mb-4 text-white font-poppins text-sm">
             <MapPinIcon className="text-primary" />
-            <span>{event.address}</span>
+            <span>{event?.address}</span>
           </div>
           <Separator className="my-4" />
           <div className="flex items-center space-x-4">
             <Avatar>
-              <AvatarImage src={event.createdBy.profileImg} />
+              <AvatarImage src={event?.createdBy?.profileImg} />
               <AvatarFallback />
             </Avatar>
             <div>
@@ -103,7 +96,7 @@ export default async function EventDetailsPage({ params }) {
                 Event Organizer
               </p>
               <p className="font-poppins text-primary text-sm">
-                {event.createdBy.fullname}
+                {event?.createdBy?.fullname}
               </p>
             </div>
           </div>
@@ -117,7 +110,7 @@ export default async function EventDetailsPage({ params }) {
               className="w-full mb-2"
               action={async () => {
                 "use server";
-                await registerForEvent(params.id, session.user._id);
+                await registerForEvent(params?.id, session?.user?._id);
               }}
             >
               {isGoingToEvent ? (

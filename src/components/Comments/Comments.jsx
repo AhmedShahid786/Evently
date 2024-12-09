@@ -9,8 +9,8 @@ export default function Comments({ comments, currentUserId, eventId }) {
       </h2>
       <AddCommentForm currentUserId={currentUserId} eventId={eventId} />
       <div className="space-y-4 overflow-y-scroll h-40">
-        {comments.length > 0 ? (
-          comments.map((comment, ind) => (
+        {comments?.length > 0 ? (
+          comments?.map((comment, ind) => (
             <Comment comment={comment} key={ind} />
           ))
         ) : (
