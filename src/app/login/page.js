@@ -22,7 +22,7 @@ export default function SignIn() {
           }}
         >
           <Button variant="outline" className="text-base px-4">
-            <Image src={googleLogo} width={25} height={25} />
+            <Image src={googleLogo} alt="google-logo" width={25} height={25} />
             Login With Google
           </Button>
         </form>

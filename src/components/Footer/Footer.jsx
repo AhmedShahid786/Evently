@@ -30,7 +30,7 @@ export default function Footer() {
     <section className="min-w-full flex">
       <div className="w-1/2 min-h-full flex flex-col items-start justify-start">
         <div className="w-2/6 h-2/4 relative cursor-pointer">
-          <Image src={logo} fill />
+          <Image src={logo} alt="logo" fill />
         </div>
         <p className="text-white text-base font-poppins pr-16">
           Your go-to platform for discovering exciting events, meeting

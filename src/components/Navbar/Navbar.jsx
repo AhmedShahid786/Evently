@@ -11,7 +11,7 @@ export default async function Navbar() {
   return (
     <nav className="flex items-center justify-between px-6">
       <div>
-        <Image src={logo} width={120} height={20} />
+        <Image src={logo} width={120} height={20} alt="logo" />
       </div>
 
       {session ? (

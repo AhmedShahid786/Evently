@@ -67,7 +67,7 @@ export default function InfoForm() {
     };
 
     fetchCountries();
-  }, []); // Empty dependency array ensures this runs only once
+  }, [countries]); // Empty dependency array ensures this runs only once
 
   const updateUserInfo = async (data) => {
     console.log(data);

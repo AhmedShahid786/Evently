@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { googleLogo, logo } from "@/assets";
 import { Button } from "@/components/ui/button";
-import { signIn } from "../../../auth";
 import Link from "next/link";
 import SignupForm from "@/components/Signup-Form/SignupForm";
 
@@ -22,7 +21,7 @@ export default function Signup() {
         // }}
         >
           <Button variant="outline" className="text-base px-4">
-            <Image src={googleLogo} width={25} height={25} />
+            <Image src={googleLogo} alt="google-logo" width={25} height={25} />
             Continue With Google
           </Button>
         </form>

@@ -36,7 +36,7 @@ export default function HowItWorks() {
 
       <div className="min-w-full">
         {howItWorksData.map((data, ind) => (
-          <HowItWorksList data={data} ind={++ind} />
+          <HowItWorksList data={data} ind={++ind} key={ind} />
         ))}
       </div>
     </section>

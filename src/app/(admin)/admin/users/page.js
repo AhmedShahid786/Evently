@@ -4,7 +4,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -36,6 +35,7 @@ export default async function Users() {
               <TableCell className="text-right">
                 <Image
                   src={user.profileImg}
+                  alt="user-img"
                   style={{ objectFit: "cover" }}
                   height={40}
                   width={40}
