@@ -3,7 +3,7 @@ import { ChevronRight, Github } from "lucide-react";
 import dynamic from "next/dynamic";
 
 export default function Hero() {
-  const Particles = dynamic(() => import("../ui/Particles"), { ssr: false });
+  const Particles = dynamic(() => import("../ui/particles.jsx"), { ssr: false });
   return (
     <main className="min-w-full min-h-[80dvh] flex flex-col justify-center items-center gap-8">
       <Particles />
