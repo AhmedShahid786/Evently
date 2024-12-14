@@ -1,158 +1,102 @@
 "use client";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { registerUser } from "@/actions/users";
-import { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { useState } from "react";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { updateUserInfo } from "@/actions/users";
+import { uploadImage } from "@/actions/upload";
+import { Loader2 } from "lucide-react";
 
-export default function InfoForm() {
+export default function InfoForm({ userId }) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const router = useRouter();
-  const infoSchema = z.object({
-    fullname: z
-      .string()
-      .min(1, "Please enter your fullname")
-      .max(20, "Fullname cannot exceed 20 characters"),
-    bio: z
-      .string()
-      .min(1, "Please enter your bio.")
-      .max(500, "Bio cannot exceed 20 characters"),
-    country: z.string(),
-    city: z.string(),
-  });
 
-  const form = useForm({
-    resolver: zodResolver(infoSchema),
-    defaultValues: {
-      fullname: "",
-      bio: "",
-      country: "",
-      city: "",
-    },
-  });
+  const updateInfo = async (event) => {
+    event.preventDefault();
+    setLoading(true);
 
-  const [countries, setCountries] = useState([]);
-  useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const response = await fetch("https://api.first.org/data/v1/countries");
-        const result = await response.json();
-        console.log("result =>", result);
+    const formData = new FormData(event.target);
+    const profileImg = await uploadImage(formData);
 
-        const countriesArray = Object.entries(result.data); // Convert object to array
-        setCountries(countriesArray);
-        console.log(countries);
-      } catch (error) {
-        console.error("Error fetching countries:", error.message);
-      }
+    const userData = {
+      id: userId,
+      fullname: formData.get("fullname"),
+      bio: formData.get("bio"),
+      profileImg: profileImg,
     };
 
-    fetchCountries();
-  }, [countries]); // Empty dependency array ensures this runs only once
+    const isUpdated = await updateUserInfo(userData);
 
-  const updateUserInfo = async (data) => {
-    console.log(data);
+    if (isUpdated.success) {
+      router.push("/");
+    } else if (isUpdated.err) {
+      setError(isUpdated.err);
+    }
+    setLoading(false);
   };
 
   return (
-    <Form {...form} className="w-full">
-      <form onSubmit={form.handleSubmit(updateUserInfo)} className="w-full">
-        <FormField
-          control={form.control}
-          name="fullname"
-          render={({ field }) => (
-            <FormItem className="w-full flex flex-col my-3">
-              <FormLabel className="text-primary font-lilita text-xl tracking-wide">
-                Fullname
-              </FormLabel>
-              <FormControl>
-                <input
-                  {...field}
-                  placeholder="eg. Ahmed Raza"
-                  className="w-full rounded-lg border-2 border-primary font-poppins bg-transparent text-sm text-white p-2 placeholder-white"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem className="flex flex-col my-3">
-              <FormLabel className="text-primary font-lilita text-xl tracking-wide">
-                Bio
-              </FormLabel>
-              <FormControl>
-                <input
-                  {...field}
-                  placeholder="eg. I'm a freelancer"
-                  className="rounded-lg border-2 border-primary font-poppins bg-transparent text-sm text-white p-2 placeholder-white"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem className="flex flex-col my-3">
-              <FormLabel className="text-primary font-lilita text-xl tracking-wide">
-                Country
-              </FormLabel>
-              <FormControl>
-                <Select>
-                  <SelectTrigger className="w-[180px] border-2 border-primary text-white font-poppins">
-                    <SelectValue placeholder="Select Country" />
-                  </SelectTrigger>
-                  <SelectContent className="border-2 border-primary text-white font-poppins bg-transparent">
-                    <SelectGroup>
-                      <SelectLabel>Categories</SelectLabel>
-                      <SelectItem value={"All"}>All</SelectItem>
-                      {/* {countries.entries(countries)?.map(([code, data]) => (
-                        <SelectItem key={code} value={code}>
-                          {data.country}
-                        </SelectItem>
-                      ))} */}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          variant="secondary"
-          disabled={loading}
-          className="w-full text-base"
+    <form onSubmit={updateInfo} className="grid items-start gap-4">
+      <div className="grid gap-2">
+        <Label
+          htmlFor="fullname"
+          className="text-primary font-lilita text-xl tracking-wide"
         >
-          Signup
-        </Button>
-      </form>
-    </Form>
+          Fullname
+        </Label>
+        <Input
+          required
+          name="fullname"
+          id="fullname"
+          placeholder="eg. Ahmed Raza"
+          className="rounded-lg border-2 border-primary font-poppins bg-transparent text-sm text-white p-2 !placeholder-white"
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label
+          htmlFor="bio"
+          className="text-primary font-lilita text-xl tracking-wide"
+        >
+          Bio
+        </Label>
+        <Textarea
+          required
+          name="bio"
+          id="bio"
+          placeholder="eg. I'm a freelancer"
+          className="rounded-lg border-2 border-primary font-poppins bg-transparent text-sm text-white p-2 !placeholder-white"
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label
+          htmlFor="thumbnail"
+          className="text-primary font-lilita text-xl tracking-wide"
+        >
+          Profile Image
+        </Label>
+        <Input
+          required
+          name="thumbnail"
+          type="file"
+          className="rounded-lg border-2 border-primary font-poppins bg-transparent text-sm text-white p-2 !placeholder-white"
+        />
+      </div>
+      <Button disabled={loading} type="submit" variant="secondary">
+        {loading ? (
+          <>
+            Updating
+            <Loader2 className="animate-spin mr-2" />
+          </>
+        ) : (
+          "Lets Go!"
+        )}
+      </Button>
+
+      {/* Error message */}
+      {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
+    </form>
   );
 }

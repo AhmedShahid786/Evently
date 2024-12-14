@@ -12,8 +12,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { verifyUserOtp } from "@/actions/users";
+import { Loader2 } from "lucide-react";
 
-export default function OtpForm({ email, otp, id }) {
+export default function OtpForm({ email, id }) {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const otpSchema = z.object({
     otp: z.string().regex(/^\d{6}$/, "Please enter a valid 6 digit OTP"),
@@ -26,16 +30,28 @@ export default function OtpForm({ email, otp, id }) {
     },
   });
 
-  const signupUser = async (data) => {
-    const isOtpCorrect = parseInt(data.otp) === parseInt(otp);
-    if (isOtpCorrect) {
-      router.push(`/info/${id}`);
-    }
-  };
+  const verifyOtp = async (data) => {
+    setLoading(true);
 
+    const verificationObj = {
+      id: id,
+      otp: data.otp,
+    };
+
+    const validateOtpRes = await verifyUserOtp(verificationObj);
+
+    if (validateOtpRes.success) {
+      router.push(`/info/${validateOtpRes.user._id}`);
+    } else {
+      form.setError("otp", {
+        message: validateOtpRes.err,
+      });
+    }
+    setLoading(false);
+  };
   return (
     <Form {...form} className="w-full">
-      <form onSubmit={form.handleSubmit(signupUser)} className="w-full">
+      <form onSubmit={form.handleSubmit(verifyOtp)} className="w-full">
         <FormField
           control={form.control}
           name="otp"
@@ -57,8 +73,20 @@ export default function OtpForm({ email, otp, id }) {
             </FormItem>
           )}
         />
-        <Button type="submit" variant="secondary" className="w-full text-base">
-          Verify
+        <Button
+          disabled={loading}
+          type="submit"
+          variant="secondary"
+          className="w-full text-base"
+        >
+          {loading ? (
+            <>
+              Verifying
+              <Loader2 className="animate-spin mr-2" />
+            </>
+          ) : (
+            "Verify"
+          )}
         </Button>
       </form>
     </Form>

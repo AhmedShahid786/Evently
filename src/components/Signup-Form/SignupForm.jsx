@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/actions/users";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
@@ -40,9 +41,18 @@ export default function SignupForm() {
 
   const signupUser = async (data) => {
     setLoading(true);
-    let newUser = await registerUser(data);
-    setLoading(false);
-    router.push(`/verify/${newUser._id}`);
+    let newUserRes = await registerUser(data);
+
+    if (newUserRes.success) {
+      setLoading(false);
+      router.push(`/verify/${newUserRes.user._id}`);
+    } else {
+      form.setError("password", {
+        type: "manual",
+        message: newUserRes.err,
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -92,7 +102,14 @@ export default function SignupForm() {
           disabled={loading}
           className="w-full text-base"
         >
-          Signup
+          {loading ? (
+            <>
+              Signing up
+              <Loader2 className="animate-spin mr-2" />
+            </>
+          ) : (
+            "Signup"
+          )}
         </Button>
       </form>
     </Form>

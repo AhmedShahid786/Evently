@@ -55,12 +55,12 @@ export function AddCategory() {
           <DialogTitle>Add Category</DialogTitle>
           <DialogDescription>All fields are required</DialogDescription>
         </DialogHeader>
-        <ProfileForm />
+        <CategoryForm />
       </DialogContent>
     </Dialog>
   );
 
-  function ProfileForm({ className }) {
+  function CategoryForm({ className }) {
     return (
       <form
         ref={formRef}
