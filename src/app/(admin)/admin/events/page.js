@@ -1,18 +1,7 @@
 import { getCategories } from "@/actions/categories";
 import { getEvents } from "@/actions/events";
 import AddEventForm from "@/components/Add-Event-Form/AddEventForm";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import Image from "next/image";
 import { auth } from "../../../../../auth";
-import CategoryDropdown from "@/components/Category-Dropdown/Category-Dropdown";
 import EventCard from "@/components/Event-Card/EventCard";
 
 export default async function Events({ searchParams }) {
