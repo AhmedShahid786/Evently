@@ -3,7 +3,11 @@
 
 //? This fuction generates a sha-key for cloudinary upload verification
 function generateSignature(timestamp, apiSecret) {
-  const crypto = require("crypto").createHash("sha256").update(`timestamp=${timestamp}${apiSecret}`).digest("hex");
+  const crypto = require("crypto");
+  const signature = crypto
+    .createHash("sha256")
+    .update(`timestamp=${timestamp}${apiSecret}`)
+    .digest("hex");
   return signature;
 }
 

@@ -26,8 +26,8 @@ export async function GET(request, { params }) {
   } catch (err) {
     return Response.json(
       {
-        msg: "Failed to fetch single user",
-        err: err.message,
+        msg: err.message,
+        err: "Failed to fetch single user",
       },
       { status: 500 }
     );

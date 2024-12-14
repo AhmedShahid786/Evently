@@ -5,10 +5,9 @@ export async function POST(request) {
   try {
     await connectDB();
 
-    const { email, otp } = await request.json();
+    const { id, otp } = await request.json();
 
-    const decodedEmail = decodeURIComponent(email);
-    const user = await userModel.findOne({ email: decodedEmail });
+    const user = await userModel.findOne({ _id: id });
 
     if (!user) {
       return Response.json(
@@ -16,11 +15,11 @@ export async function POST(request) {
           msg: "User not found",
           err: "No user found with this email",
         },
-        { status: 500 }
+        { status: 404 }
       );
     }
 
-    const isOtpValid = user.otp === otp;
+    const isOtpValid = parseInt(user.otp) === parseInt(otp);
     const isOtpNotExpired = new Date(user.otpExpiry) > new Date();
 
     if (isOtpValid && isOtpNotExpired) {
@@ -37,7 +36,7 @@ export async function POST(request) {
       return Response.json(
         {
           msg: "Failed to verify otp",
-          err: "Otp has expired",
+          err: "Entered OTP has been expired. Please request another otp.",
         },
         { status: 500 }
       );
@@ -45,7 +44,7 @@ export async function POST(request) {
       return Response.json(
         {
           msg: "Failed to verify otp",
-          err: "Otp is not valid",
+          err: "The entered OTP is not correct. Please try again.",
         },
         { status: 500 }
       );
@@ -53,10 +52,7 @@ export async function POST(request) {
   } catch (err) {
     console.error("Error verifying otp =>", err);
     return Response.json(
-      {
-        msg: "Failed to send verify otp",
-        err: err,
-      },
+      { msg: "Failed to process your request.", err: "Internal Server Error" },
       { status: 500 }
     );
   }

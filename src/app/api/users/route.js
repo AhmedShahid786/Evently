@@ -42,26 +42,28 @@ export async function POST(request) {
         existingUserByEmail.otpExpiry = new Date(Date.now() + 3600000);
 
         await existingUserByEmail.save();
+        const sentEmail = await sendVerificationEmail(email, otp);
 
         return Response.json(
           {
             msg: "Unverified user exist, email sent successfully",
+            otp: otp,
             user: existingUserByEmail,
           },
-          { status: 500 }
+          { status: 201 }
         );
       }
     } else {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      const expiryDate = new Date();
+      const otpExpiry = new Date(Date.now() + 3600000);
 
       newUser = new userModel({
         email: email,
         password: hashedPassword,
         otp: otp,
-        otpExpiry: expiryDate,
+        otpExpiry: otpExpiry,
       });
       await newUser.save();
     }
