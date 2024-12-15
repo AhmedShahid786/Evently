@@ -1,100 +1,138 @@
 "use client";
-import React, { useState, useRef } from "react";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useToast } from "../ui/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { uploadImage } from "@/actions/upload";
 import { addCategory } from "@/actions/categories";
-import { useToast } from "@/components/ui/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
-export function AddCategory() {
+export default function AddCategoryForm() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const formRef = useRef();
 
-  const addCategoryToDb = async (formData) => {
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
     setLoading(true);
-    const thumbnailLink = await uploadImage(formData);
+    const formData = new FormData(formRef?.current);
 
-    const categoryObj = {
-      title: formData.get("title"),
-      description: formData.get("description"),
-      thumbnail: thumbnailLink,
-    };
+    try {
+      const thumbnailLink = await uploadImage(formData);
 
-    await addCategory(categoryObj);
+      const categoryObj = {
+        title: formData.get("title"),
+        description: formData.get("description"),
+        thumbnail: thumbnailLink,
+      };
 
+      await addCategory(categoryObj);
+
+      setLoading(false);
+      setOpen(false);
+      formRef?.current?.reset();
+      toast({
+        title: "Category Added",
+        description: "Category added successfully",
+      });
+      formRef?.current?.reset();
+    } catch (err) {
+      console.log(err);
+      toast({ title: "Oops", description: err.message });
+    }
     setLoading(false);
-    setOpen(false);
-    formRef?.current?.reset();
-    toast({
-      title: "Category Added",
-      description: "Category added successfully",
-    });
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
         <Button variant="outline">Add Category</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add Category</DialogTitle>
-          <DialogDescription>All fields are required</DialogDescription>
-        </DialogHeader>
+      </SheetTrigger>
+      <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto bg-black">
+        <SheetHeader>
+          <SheetTitle className="font-lilita text-3xl text-primary tracking-wider">
+            Add New Category
+          </SheetTitle>
+          <SheetDescription className="font-poppins text-white">
+            Fill in the details for new category.
+          </SheetDescription>
+        </SheetHeader>
         <CategoryForm />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 
-  function CategoryForm({ className }) {
+  function CategoryForm() {
     return (
       <form
         ref={formRef}
-        action={addCategoryToDb}
-        className={cn("grid items-start gap-4", className)}
+        onSubmit={handleFormSubmit}
+        className="grid items-start gap-4 mt-4"
       >
         <div className="grid gap-2">
-          <Label htmlFor="title">Title</Label>
-          <Input
+          <Label
+            htmlFor="title"
+            className="text-primary font-poppins text-base"
+          >
+            Title
+          </Label>
+          <Textarea
             required
             name="title"
-            type="title"
             id="title"
-            placeholder="Category Title"
+            maxlength="20"
+            placeholder="Title"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="description">Description</Label>
-          <Input
+          <Label
+            htmlFor="description"
+            className="text-primary font-poppins text-base"
+          >
+            Description
+          </Label>
+          <Textarea
             required
             name="description"
             id="description"
+            maxlength="500"
             placeholder="Category Description"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="thumbnail">Thumbnail</Label>
-          <Input required name="thumbnail" type="file" />
+          <Label
+            htmlFor="thumbnail"
+            className="text-primary font-poppins text-base"
+          >
+            Thumbnail
+          </Label>
+          <Input
+            required
+            name="thumbnail"
+            type="file"
+            accept="image/*"
+            className="border-2 border-white rounded-lg text-sm text-white font-poppins !placeholder-white"
+          />
         </div>
-        <Button disabled={loading} type="submit">
+        <Button type="submit" variant="secondary" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="animate-spin" />
               Adding
+              <Loader2 className="animate-spin mr-2" />
             </>
           ) : (
             "Add Category"

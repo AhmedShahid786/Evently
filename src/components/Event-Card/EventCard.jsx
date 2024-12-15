@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { MapPin } from "lucide-react";
 
-export default function EventCard({ event }) {
+export default function EventCard({ event, adminControls = false }) {
   const { _id, category, title, description, thumbnail, address } = event;
   return (
     <div className="w-60 flex flex-col items-start justify-between gap-1 p-2 border-2 border-primary rounded-lg">
@@ -32,7 +32,10 @@ export default function EventCard({ event }) {
       <h3 className="text-white font-poppins text-sm text-left line-clamp-2">
         {description}
       </h3>
-      <Link href={`/events/${_id}`} className="w-full">
+      <Link
+        href={adminControls ? `/admin/events/${_id}` : `/events/${_id}`}
+        className="w-full"
+      >
         <Button variant="secondary" className="w-full text-base">
           Explore
         </Button>
