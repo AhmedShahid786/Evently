@@ -18,7 +18,7 @@ export default async function Events({ searchParams }) {
 
       <section className="w-full h-4/5 overflow-y-scroll py-6 flex flex-wrap justify-between gap-3">
         {events?.map((event, ind) => (
-          <EventCard event={event} key={ind} />
+          <EventCard event={event} key={ind} adminControls={true} />
         ))}
       </section>
     </div>

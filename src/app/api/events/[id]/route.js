@@ -32,3 +32,38 @@ export async function GET(request, { params }) {
     );
   }
 }
+
+export async function DELETE(request, { params }) {
+  try {
+    await connectDB();
+    console.log(params.id);
+
+    const deletedEvent = await eventModel.findByIdAndDelete(params.id);
+
+    if (!deletedEvent) {
+      return Response.json(
+        {
+          msg: "No event found with this id",
+          err: "Event not found",
+        },
+        { status: 404 }
+      );
+    } else {
+      return Response.json(
+        {
+          msg: "Single event deleted successfully",
+          event: deletedEvent,
+        },
+        { status: 200 }
+      );
+    }
+  } catch (err) {
+    return Response.json(
+      {
+        msg: err.message,
+        err: "Failed to delete event",
+      },
+      { status: 500 }
+    );
+  }
+}

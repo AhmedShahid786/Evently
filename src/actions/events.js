@@ -7,6 +7,8 @@ import { uploadImage } from "./upload";
 
 //? This function receives event obj from front-end and makes a POST request to add a new event to db
 export const addEventToDb = async (formData) => {
+  const url = `${process.env.BASE_URL}/api/events`;
+
   const thumbnailUrl = await uploadImage(formData);
 
   const eventObj = {
@@ -23,13 +25,6 @@ export const addEventToDb = async (formData) => {
     category: formData.get("category"),
     createdBy: formData.get("createdBy"),
   };
-
-  await addEvent(eventObj);
-};
-
-//? This function receives event obj from front-end and makes a POST request to add a new event to db
-export const addEvent = async (eventObj) => {
-  const url = `${process.env.BASE_URL}/api/events`;
 
   try {
     const addedEvent = await fetch(url, {
@@ -53,7 +48,7 @@ export const addEvent = async (eventObj) => {
   }
 };
 
-//? This function fetches all events from db and returns them
+//? This function fetches all events or events related to a category from db and returns them in response
 export const getEvents = async (category) => {
   let url;
   if (category) {
@@ -63,7 +58,7 @@ export const getEvents = async (category) => {
   }
 
   try {
-    let events = await fetch(url);
+    let events = await fetch(url, { cache: "no-cache" });
     events = await events.json();
     console.log("Events fetched from db");
     return events;
@@ -72,7 +67,7 @@ export const getEvents = async (category) => {
   }
 };
 
-//? This function fetches a single event from db and returns it
+//? This function receives eventId as parameter, fetches a single event against that eventId from db and returns it in repsonse
 export const getSingleEvent = async (eventId) => {
   let url = `${process.env.BASE_URL}/api/events/${eventId}`;
 
@@ -90,6 +85,7 @@ export const getSingleEvent = async (eventId) => {
   }
 };
 
+//? This function recieves eventId and userId as parameter and registers the user against that userId in event attendees
 export const registerForEvent = async (eventId, userId) => {
   let url = `${process.env.BASE_URL}/api/events/${eventId}/going`;
   const register = await fetch(url, {
@@ -101,5 +97,23 @@ export const registerForEvent = async (eventId, userId) => {
     revalidatePath(`/events/${eventId}`);
   } else {
     redirect("/not-found");
+  }
+};
+
+//? This event receives eventId as parameter, deletes the event against that eventId and returns the deleted event in response
+export const deleteEventFromDb = async (eventId) => {
+  let url = `${process.env.BASE_URL}/api/events/${eventId}`;
+
+  try {
+    let deletedEvent = await fetch(url, { method: "DELETE" });
+    deletedEvent = await deletedEvent.json();
+
+    if (deletedEvent.event) {
+      return { success: true, event: deletedEvent.event };
+    } else {
+      return { success: false, err: deletedEvent.err };
+    }
+  } catch (err) {
+    return { success: false, err: "Oops, something went wrong" };
   }
 };
