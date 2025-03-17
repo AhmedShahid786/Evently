@@ -36,7 +36,6 @@ export async function GET(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     await connectDB();
-    console.log(params.id);
 
     const deletedEvent = await eventModel.findByIdAndDelete(params.id);
 
@@ -62,6 +61,62 @@ export async function DELETE(request, { params }) {
       {
         msg: err.message,
         err: "Failed to delete event",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request, { params }) {
+  try {
+    await connectDB();
+
+    const eventObj = await request.json();
+
+    const updatedEventObj = {
+      title: eventObj.title,
+      description: eventObj.description,
+      thumbnail: eventObj.thumbnail,
+      startTime: eventObj.startTime,
+      endTime: eventObj.endTime,
+      startDate: eventObj.startDate,
+      endDate: eventObj.endDate,
+      location: {
+        lat: eventObj.lat,
+        long: eventObj.long,
+      },
+      address: eventObj.address,
+      category: eventObj.category,
+    };
+
+    const updatedEvent = await eventModel.findOneAndUpdate(
+      { _id: params.id },
+      { $set: updatedEventObj },
+      { new: true }
+    );
+
+    if (!updatedEvent) {
+      return Response.json(
+        {
+          msg: "Failed to update event",
+          err: "Failed to update event",
+        },
+        { status: 500 }
+      );
+    }
+
+    return Response.json(
+      {
+        msg: "Event updated successfully",
+        event: updatedEvent,
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    return Response.json(
+      {
+        msg: err.message,
+        err: "Oops, something went wrong",
       },
       { status: 500 }
     );

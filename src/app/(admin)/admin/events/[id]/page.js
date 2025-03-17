@@ -20,11 +20,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Comments from "@/components/Comments/Comments";
 import Attendees from "@/components/Attendees/Attendees";
 import EventControls from "@/components/Event-Controls/EventControls";
+import { getCategories } from "@/actions/categories";
 dayjs.extend(relativeTime);
 
 export default async function EventDetailsPage({ params }) {
   const event = (await getSingleEvent(params.id)).event;
-  console.log(event);
+  const categories = (await getCategories()).categories;
 
   if (!event) redirect("not-found");
   const session = await auth();
@@ -99,7 +100,7 @@ export default async function EventDetailsPage({ params }) {
           <Attendees attendees={event?.going} />
         </CardContent>
         <CardFooter className="flex flex-col">
-          <EventControls eventId={params.id} />
+          <EventControls event={event} categories={categories} />
 
           {session && (
             <Comments

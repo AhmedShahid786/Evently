@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/dist/server/api-utils";
 import { uploadImage } from "./upload";
 
-//? This function receives event obj from front-end and makes a POST request to add a new event to db
+//? This function receives event-form data from front-end and makes a POST request to add a new event to db
 export const addEventToDb = async (formData) => {
   const url = `${process.env.BASE_URL}/api/events`;
 
@@ -72,7 +72,7 @@ export const getSingleEvent = async (eventId) => {
   let url = `${process.env.BASE_URL}/api/events/${eventId}`;
 
   try {
-    let event = await fetch(url);
+    let event = await fetch(url, { cache: "no-store" });
     if (event.ok) {
       event = await event.json();
       console.log("Single event fetched from db");
@@ -114,6 +114,48 @@ export const deleteEventFromDb = async (eventId) => {
       return { success: false, err: deletedEvent.err };
     }
   } catch (err) {
+    return { success: false, err: "Oops, something went wrong" };
+  }
+};
+
+//? This function receives event-form data from front-end and makes a PUT request to update the event in db
+export const updateEventInDb = async (formData, eventId) => {
+  const url = `${process.env.BASE_URL}/api/events/${eventId}`;
+  // console.log("formData ===========>>>>>>>>>>", formData);
+  try {
+    const thumbnailUrl = await uploadImage(formData);
+
+    const eventObj = {
+      title: formData.get("title"),
+      description: formData.get("description"),
+      thumbnail: thumbnailUrl,
+      startTime: formData.get("startTime"),
+      endTime: formData.get("endTime"),
+      startDate: formData.get("startDate"),
+      endDate: formData.get("endDate"),
+      lat: Number(formData.get("lat")),
+      long: Number(formData.get("long")),
+      address: formData.get("address"),
+      category: formData.get("category"),
+    };
+
+    const updatedEventRes = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventObj),
+    });
+
+    if (updatedEventRes.event) {
+      revalidatePath(`${process.env.BASE_URL}/admin/events/${eventId}`);
+      return { success: true, event: updatedEventRes.event };
+    } else {
+      console.log(updateEventInDb.err);
+      return { success: false, err: updatedEventRes.err };
+    }
+  } catch (err) {
+    console.log("caught err ================>>>>>>>>>>>>>>>>>", err);
     return { success: false, err: "Oops, something went wrong" };
   }
 };
