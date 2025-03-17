@@ -5,13 +5,28 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 
 const handleUser = async (profile) => {
+  const { name, picture, email } = profile;
   await connectDB();
-  const user = await userModel.findOne({ email: profile.email });
-  if (!user) {
-    throw new Error("No user found with this email");
+
+  const existingUserByEmail = await userModel.findOne({ email: email });
+  if (existingUserByEmail) {
+    if (existingUserByEmail.password) {
+      throw new Error(
+        "This email is already in use. Please use a different email"
+      );
+    } else {
+      return existingUserByEmail;
+    }
   }
 
-  return user;
+  let newUser = new userModel({
+    fullname: name,
+    email: email,
+    profileImg: picture,
+    isVerified: true,
+  });
+  newUser = await newUser.save();
+  return newUser;
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -39,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           if (!user) {
-            throw new Error("No user found with this email");
+            console.log("No user found with this email");
           }
 
           const isPasswordValid = await bcrypt.compare(
@@ -50,7 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (isPasswordValid) {
             return user;
           } else {
-            throw new Error("Incorrect password");
+            console.log("Incorrect password");
           }
         } catch (err) {
           throw new Error(err);
@@ -60,28 +75,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ profile }) {
-      const user = await handleUser(profile);
+      try {
+        const user = await handleUser(profile);
 
-      profile.role = user.role;
-      profile._id = user._id;
-      return true;
+        profile.role = user.role;
+        profile._id = user._id;
+        // console.log(
+        //   "profile yerhi ================++++>>>>>>>>>>>>>>>>",
+        //   profile
+        // );
+
+        return true;
+      } catch (error) {
+        // Redirect to the login page with an error message
+        return `/signup?error=${encodeURIComponent(error.message)}`;
+      }
     },
     async jwt({ token, user, profile }) {
-      // console.log("profile=>", profile);
       if (user) {
-        // User is available during sign-in
         token._id = profile._id;
         token.role = profile.role;
       }
+      // console.log("token =====================>>>>>>>>>>", token);
       return token;
     },
     session({ session, token }) {
-      // console.log("session data=>", token);
       if (token) {
-        session.user.id = token.id;
         session.user._id = token._id;
         session.user.role = token.role;
       }
+      // console.log("session ==============>>>>>>>>>>>>", session);
+
       return session;
     },
   },
