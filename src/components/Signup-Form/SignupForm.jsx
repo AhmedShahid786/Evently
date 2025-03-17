@@ -13,12 +13,15 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/actions/users";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useToast } from "../ui/hooks/use-toast";
 
-export default function SignupForm() {
+export default function SignupForm({ authError }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
+
   const signupSchema = z.object({
     email: z.string().email("Please enter a valid email address."),
     password: z
@@ -54,6 +57,12 @@ export default function SignupForm() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (authError) {
+      toast({ title: "Authentication Failed", description: authError });
+    }
+  }, [authError]);
 
   return (
     <Form {...form} className="w-full">
