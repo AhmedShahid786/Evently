@@ -1,17 +1,18 @@
 "use client";
 
-import { PenBox, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { deleteEventFromDb } from "@/actions/events";
 import { useToast } from "../ui/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import EventForm from "../Event-Form/EventForm";
 
-export default function EventControls({ eventId }) {
+export default function EventControls({ event, categories }) {
   const router = useRouter();
   const { toast } = useToast();
 
   const handleEventDeletion = async () => {
-    const { success, err } = await deleteEventFromDb(eventId);
+    const { success, err } = await deleteEventFromDb(event._id);
 
     if (err) {
       toast({ title: "Oops", description: err });
@@ -20,8 +21,6 @@ export default function EventControls({ eventId }) {
       router.push("/admin/events");
     }
   };
-
-  const handleEventUpdation = async () => {};
 
   return (
     <div className="w-full mb-2 flex items-center justify-between">
@@ -32,13 +31,7 @@ export default function EventControls({ eventId }) {
       >
         Delete <Trash className="mr-2 h-4 w-4" />
       </Button>
-      <Button
-        onClick={handleEventUpdation}
-        variant="secondary"
-        className="w-[45%]"
-      >
-        Edit <PenBox className="mr-2 h-4 w-4" />
-      </Button>
+      <EventForm existingEvent={event} categories={categories} />
     </div>
   );
 }

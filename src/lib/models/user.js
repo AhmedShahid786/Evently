@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
+console.log(mongoose.models);
 
 const userSchema = new Schema({
   fullname: String,
@@ -18,7 +19,7 @@ const userSchema = new Schema({
     enum: ["user", "admin"],
   },
   otp: String,
-  otpExpiry: { type: Date, required: true },
+  otpExpiry: Date,
   isVerified: { type: Boolean, default: false },
 });
 
